@@ -1,57 +1,57 @@
 import { AiResponseParser } from '../src/index';
 
 /**
- * 示例：如何使用 AiResponseParser 类
+ * Example: How to use the AiResponseParser class
  */
 function example() {
-    // 创建解析器实例
+    // Create parser instance
     const parser = new AiResponseParser();
 
-    // 监听 API 调用事件
+    // Listen for API call events
     parser.on('apiCall', (apiCall) => {
-        console.log('收到 API 调用:', apiCall);
+        console.log('Received API call:', apiCall);
 
-        // 模拟 API 调用
+        // Simulate API call
         setTimeout(() => {
-            // 添加 API 执行结果
+            // Add API execution result
             parser.addApiResult(
                 apiCall.call_id,
                 apiCall.name,
-                { success: true, message: `API ${apiCall.name} 执行成功` }
+                { success: true, message: `API ${apiCall.name} executed successfully` }
             );
         }, 1000);
     });
 
-    // 监听 API 结果事件
+    // Listen for API results events
     parser.on('apiResults', (results) => {
-        console.log('所有 API 执行结果:', results);
+        console.log('All API execution results:', results);
     });
 
-    // 模拟流式数据输入
+    // Simulate streaming data input
     const streamData = [
-        '这是一些文本，然后有一个 API 调用：',
+        'This is some text, then there is an API call:',
         '<call_api>',
-        '<instructions>获取用户信息</instructions>',
+        '<instructions>Get user information</instructions>',
         '<call_id>1</call_id>',
         '<name>getUserInfo</name>',
         '<parameters>',
         '{"userId": "12345"}',
         '</parameters>',
         '</call_api>',
-        '这是更多文本，然后有另一个 API 调用：',
+        'This is more text, then there is another API call:',
         '<call_api>',
-        '<instructions>更新用户状态</instructions>',
+        '<instructions>Update user status</instructions>',
         '<call_id>2</call_id>',
         '<name>updateUserStatus</name>',
         '<parameters>',
         '{"userId": "12345", "status": "active"}',
         '</parameters>',
         '</call_api>',
-        '这是最后一些文本。',
+        'This is the last text.',
         ''
     ];
 
-    // 模拟流式处理
+    // Simulate streaming processing
     let isLast = false;
     for (let i = 0; i < streamData.length; i++) {
         if (i === streamData.length - 1) {
@@ -61,5 +61,5 @@ function example() {
     }
 }
 
-// 运行示例
+// Run example
 example(); 

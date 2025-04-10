@@ -1,94 +1,94 @@
 import { getToolPrompt } from '../src/index';
 
 /**
- * 示例：如何使用 getToolPrompt 函数
+ * Example: How to use the getToolPrompt function
  */
 function example() {
-    // 准备API包数据
+    // Prepare API package data
     const apiPacket = [
         {
-            description: '用户相关API',
+            description: 'User-related APIs',
             api_list: [
                 {
                     "name": "getUserInfo",
-                    "description": "获取用户信息",
+                    "description": "Get user information",
                     "parameters": {
                         "type": "object",
                         "properties": {
                             "userId": {
                                 "type": "string",
-                                "description": "用户ID",
+                                "description": "User ID",
                             },
                         },
                         "required": ["userId"],
                     },
                     "returns": {
                         "type": "object",
-                        "description": "用户信息",
+                        "description": "User information",
                     },
                 },
                 {
                     "name": "updateUserStatus",
-                    "description": "更新用户状态",
+                    "description": "Update user status",
                     "parameters": {
                         "type": "object",
                         "properties": {
                             "userId": {
                                 "type": "string",
-                                "description": "用户ID",
+                                "description": "User ID",
                             },
                             "status": {
                                 "type": "string",
-                                "description": "用户状态",
+                                "description": "User status",
                             },
                         },
                         "required": ["userId", "status"],
                     },
                     "returns": {
                         "type": "boolean",
-                        "description": "更新是否成功",
+                        "description": "Whether the update was successful",
                     },
                 }
             ]
         },
         {
-            description: '产品相关API',
+            description: 'Product-related APIs',
             api_list: [
                 {
                     "name": "getProductList",
-                    "description": "获取产品列表",
+                    "description": "Get product list",
                     "parameters": {
                         "type": "object",
                         "properties": {
                             "page": {
                                 "type": "number",
-                                "description": "页码",
+                                "description": "Page number",
                             },
                             "limit": {
                                 "type": "number",
-                                "description": "每页数量",
+                                "description": "Items per page",
                             },
                         },
                         "required": ["page", "limit"],
                     },
                     "returns": {
                         "type": "array",
-                        "description": "产品列表",
+                        "description": "Product list",
                     },
                 }
             ]
         }
     ];
 
-    // 生成工具提示
+    // Generate tool prompt
     const toolPrompt = getToolPrompt(apiPacket);
 
-    // 输出工具提示
-    console.log('生成的工具提示:');
+    // Output tool prompt
+    console.log('Generated tool prompt:');
     console.log('----------------------------------------');
     console.log(toolPrompt);
     console.log('----------------------------------------');
 }
 
-// 运行示例
+// Run example
 example(); 

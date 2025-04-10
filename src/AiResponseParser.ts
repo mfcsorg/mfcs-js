@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 
 /**
- * API 调用参数接口
+ * API call parameters interface
  */
 interface ApiCallParameters {
     instructions: string;
@@ -11,7 +11,7 @@ interface ApiCallParameters {
 }
 
 /**
- * API 执行结果接口
+ * API execution result interface
  */
 interface ApiResult {
     call_id: number;
@@ -20,8 +20,8 @@ interface ApiResult {
 }
 
 /**
- * AI 响应解析器类
- * 用于解析流式 AI 响应，处理 API 调用和结果
+ * AI Response Parser class
+ * Used to parse streaming AI responses, handle API calls and results
  */
 export class AiResponseParser extends EventEmitter {
     private buffer: string = '';
@@ -35,19 +35,19 @@ export class AiResponseParser extends EventEmitter {
     }
 
     /**
-     * 处理流式 AI 响应数据
-     * @param chunk 数据块
-     * @param isLast 是否为最后一块数据
+     * Process streaming AI response data
+     * @param chunk Data chunk
+     * @param isLast Whether this is the last chunk
      */
     public processChunk(chunk: string, isLast: boolean = false): void {
         if (chunk != null && chunk != undefined && chunk != '') {
             this.buffer += chunk;
 
-            // 尝试解析完整的 call_api 块
+            // Try to parse complete call_api blocks
             this.parseCallApiBlocks();
         }
 
-        // 如果是最后一块数据，标记为完成并触发结果事件
+        // If this is the last chunk, mark as complete and trigger results event
         if (isLast) {
             this.isComplete = true;
             this.emitApiResults();
@@ -55,7 +55,7 @@ export class AiResponseParser extends EventEmitter {
     }
 
     /**
-     * 解析缓冲区中的 call_api 块
+     * Parse call_api blocks from buffer
      */
     private parseCallApiBlocks(): void {
         const callApiRegex = /<call_api>([\s\S]*?)<\/call_api>/g;
@@ -72,18 +72,18 @@ export class AiResponseParser extends EventEmitter {
                     this.emit('apiCall', apiCall);
                 }
             } catch (error) {
-                console.error('解析 call_api 块失败:', error);
+                console.error('Failed to parse call_api block:', error);
             }
 
-            // 从缓冲区中移除已处理的块
+            // Remove processed block from buffer
             this.buffer = this.buffer.replace(callApiBlock, '');
         }
     }
 
     /**
-     * 解析 call_api 内容
-     * @param content call_api 标签内的内容
-     * @returns 解析后的 API 调用参数
+     * Parse call_api content
+     * @param content Content inside call_api tags
+     * @returns Parsed API call parameters
      */
     private parseCallApiContent(content: string): ApiCallParameters | null {
         const instructionsMatch = /<instructions>([\s\S]*?)<\/instructions>/i.exec(content);
@@ -103,7 +103,7 @@ export class AiResponseParser extends EventEmitter {
         try {
             parameters = JSON.parse(parametersMatch[1].trim());
         } catch (error) {
-            console.error('解析参数 JSON 失败:', error);
+            console.error('Failed to parse parameters JSON:', error);
             return null;
         }
 
@@ -111,22 +111,22 @@ export class AiResponseParser extends EventEmitter {
     }
 
     /**
-     * 添加 API 执行结果
-     * @param callId API 调用 ID
-     * @param name API 名称
-     * @param result 执行结果
+     * Add API execution result
+     * @param callId API call ID
+     * @param name API name
+     * @param result Execution result
      */
     public addApiResult(callId: number, name: string, result: Record<string, any>): void {
         this.apiResults.set(callId, { call_id: callId, name, result });
 
-        // 如果所有 API 调用都有结果且解析已完成，触发结果事件
+        // If all API calls have results and parsing is complete, trigger results event
         if (this.isComplete && this.apiCalls.size === this.apiResults.size) {
             this.emitApiResults();
         }
     }
 
     /**
-     * 触发 API 结果事件
+     * Emit API results event
      */
     private emitApiResults(): void {
         if (this.apiCalls.size === 0 || this.apiCalls.size !== this.apiResults.size) {
@@ -135,7 +135,7 @@ export class AiResponseParser extends EventEmitter {
 
         let resultText = '<api_result>\n';
 
-        // 按 call_id 排序结果
+        // Sort results by call_id
         const sortedResults = Array.from(this.apiResults.values())
             .sort((a, b) => a.call_id - b.call_id);
 
