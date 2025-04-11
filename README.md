@@ -65,6 +65,74 @@ parser.processChunk('More text', true); // Last chunk of data
 - `addApiResult(callId: number, name: string, result: Record<string, any>)`: Add API execution result.
 - `getToolResultPrompt()`: Get tool execution result prompt.
 
+### AI Response Parse Function (parseAiResponse)
+
+The `parseAiResponse` function is used to parse AI responses containing one or more API call blocks. It extracts structured information from the response text and returns an array of API call objects.
+
+#### Main Features
+
+1. **Parse Multiple API Calls**: Extract all API call blocks from a response text.
+2. **Structured Data**: Return parsed data in a structured format with typed fields.
+3. **Error Handling**: Handle JSON parsing errors gracefully.
+
+#### Usage
+
+```typescript
+import { parseAiResponse } from 'mfcs';
+
+// Example response text with multiple API calls
+const response = `
+<call_api>
+<instructions>Get user information</instructions>
+<call_id>call_123</call_id>
+<name>getUserInfo</name>
+<parameters>
+{
+  "userId": "12345",
+  "includeProfile": true
+}
+</parameters>
+</call_api>
+
+<call_api>
+<instructions>Update user settings</instructions>
+<call_id>call_456</call_id>
+<name>updateUserSettings</name>
+<parameters>
+{
+  "theme": "dark",
+  "notifications": false
+}
+</parameters>
+</call_api>
+`;
+
+// Parse the response
+const apiCalls = parseAiResponse(response);
+console.log(apiCalls);
+
+// Access specific API call information
+if (apiCalls.length > 0) {
+  console.log(`Instructions: ${apiCalls[0].instructions}`);
+  console.log(`Call ID: ${apiCalls[0].call_id}`);
+  console.log(`API Name: ${apiCalls[0].name}`);
+  console.log(`Parameters:`, apiCalls[0].parameters);
+}
+```
+
+#### Return Type
+
+The function returns an array of `ApiCall` objects with the following structure:
+
+```typescript
+interface ApiCall {
+  instructions: string;
+  call_id: string;
+  name: string;
+  parameters: Record<string, any>;
+}
+```
+
 ### Tool Prompt Generator
 
 The `getToolPrompt` function is used to generate tool prompts, including API list and calling rules.
@@ -111,7 +179,16 @@ console.log(prompt);
 Run examples:
 
 ```bash
-npm run example
+npm install
+npm run example:parser
+npm run example:parse
+npm run example:toolprompt
+
+# Windows
+set OPENAI_API_KEY=your_api_key_here
+# Linux/Mac
+export OPENAI_API_KEY=your_api_key_here
+npm run example:reasoningmcp
 ```
 
 ## License

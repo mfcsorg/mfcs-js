@@ -1,6 +1,6 @@
 {
     "name": "mfcs-js",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "A utility library for common JavaScript operations",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -9,7 +9,9 @@
         "test": "jest",
         "prepare": "npm run build",
         "example:parser": "ts-node examples/AiResponseParserExample.ts",
-        "example:toolprompt": "ts-node examples/ToolPromptExample.ts"
+        "example:parse": "ts-node examples/ParseAiResponseExample.ts",
+        "example:toolprompt": "ts-node examples/ToolPromptExample.ts",
+        "example:reasoningmcp": "ts-node examples/DeepseekReasoningMcpExample.ts"
     },
     "keywords": [
         "utility",
@@ -17,13 +19,15 @@
         "typescript"
     ],
     "author": "chenping",
-    "license": "Apache-2.0",
+    "license": "MIT",
     "devDependencies": {
         "@types/jest": "^29.5.12",
         "@types/node": "^20.11.24",
         "jest": "^29.7.0",
         "ts-jest": "^29.1.2",
         "ts-node": "^10.9.2",
+        "@modelcontextprotocol/sdk": "^1.8.0",
+        "openai": "^4.85.3",
         "typescript": "^5.3.3"
     }
 }
