@@ -45,7 +45,11 @@ parser.on('apiCall', (apiCall) => {
 
 // Listen for API results events
 parser.on('apiResults', (results) => {
-  console.log('All API execution results:', results);
+  if (results) {
+      console.log('All API execution results:', results);
+  } else {
+      console.log('No API execution');
+  }
 });
 
 // Process streaming data

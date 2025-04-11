@@ -129,7 +129,11 @@ export class AiResponseParser extends EventEmitter {
      * Emit API results event
      */
     private emitApiResults(): void {
-        if (this.apiCalls.size === 0 || this.apiCalls.size !== this.apiResults.size) {
+        if (this.apiCalls.size === 0) {
+            this.emit('apiResults', null);
+            return;
+        }
+        if (this.apiCalls.size !== this.apiResults.size) {
             return;
         }
 
