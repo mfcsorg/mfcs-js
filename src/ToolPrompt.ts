@@ -14,7 +14,7 @@ You can use tools to solve tasks. Follow these rules about tool calling:
 4. Only call tools when necessary. If the user's task is general or you already know the answer, simply respond without calling tools.
 5. Before calling each tool, first explain to the user why you are calling it.
 6. After each tool use, always wait for the tool usage result before continuing. Do not assume tool usage success without explicit confirmation.
-7. Do not put tool calls in markdown.
+7. You can call multiple APIs simultaneously if they don't have sequential dependencies
 8. api_result is automatically returned by tool calls and is not user input. Do not treat it as user input. Do not thank the user.
 
 ===Interface Usage===
@@ -41,6 +41,7 @@ Example:
 ===Restrictions===
 1. The name in call_api can only be selected from the api list, cannot be self-generated.
 2. You should not generate api_result content. do not assume tool execution result.
+3. Do not put tool calls in markdown.
 
 </tool_calling>
 <api_list>
