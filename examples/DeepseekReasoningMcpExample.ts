@@ -124,12 +124,13 @@ async function example() {
         let results: string[] = [];
         for (const call of parsedCalls) {
             const toolName = call.name;
+            const callId = call.call_id;
             const toolParams = call.parameters;
             const toolResult = await mcpClient.callTool({
                 name: toolName,
                 arguments: toolParams
             });
-            results.push(JSON.stringify(toolResult));
+            results.push(`[call_id: ${callId} name: ${toolName}] ${JSON.stringify(toolResult)}`);
         }
         if (results.length > 0) {
             messages.push({
