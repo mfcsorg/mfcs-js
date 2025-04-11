@@ -5,7 +5,7 @@
  */
 export function getToolPrompt(packet: any): string {
 
-    let prompt = `
+  let prompt = `
 <tool_calling>
 You can use tools to solve tasks. Follow these rules about tool calling:
 1. Always strictly follow the specified tool calling pattern and ensure all necessary parameters are provided.
@@ -40,11 +40,12 @@ Example:
 
 ===Restrictions===
 1. The name in call_api can only be selected from the api list, cannot be self-generated.
+2. You should not generate api_result content. do not assume tool execution result.
 
 </tool_calling>
 <api_list>
 ${JSON.stringify(packet)}
 </api_list>
     `
-    return prompt
+  return prompt
 }

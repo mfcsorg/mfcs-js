@@ -4,6 +4,11 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import * as readline from 'readline';
 
+const COLORS = {
+    CYAN: '\x1b[36m',
+    RESET: '\x1b[0m'
+};
+
 interface DeepseekDelta extends OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta {
     reasoning_content?: string;
 }
@@ -110,7 +115,7 @@ async function example() {
             }
 
             if (reasoningContent) {
-                process.stdout.write(reasoningContent);
+                process.stdout.write(COLORS.CYAN + reasoningContent + COLORS.RESET);
             }
         }
         process.stdout.write('\n');
@@ -133,9 +138,11 @@ async function example() {
             results.push(`[call_id: ${callId} name: ${toolName}] ${JSON.stringify(toolResult)}`);
         }
         if (results.length > 0) {
+            let toolResultContent = `${API_RESULT_TAG}\n${results.join('\n')}\n${API_RESULT_END_TAG}`
+            console.log(toolResultContent);
             messages.push({
                 role: 'user',
-                content: `${API_RESULT_TAG}${results.join('\n')}${API_RESULT_END_TAG}`
+                content: toolResultContent
             });
             requestUserInput = false;
         } else {
