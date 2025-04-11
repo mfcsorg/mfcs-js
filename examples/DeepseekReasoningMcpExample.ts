@@ -6,7 +6,9 @@ import * as readline from 'readline';
 
 const COLORS = {
     CYAN: '\x1b[36m',
-    RESET: '\x1b[0m'
+    RESET: '\x1b[0m',
+    GREEN: '\x1b[32m',
+    YELLOW: '\x1b[33m'
 };
 
 interface DeepseekDelta extends OpenAI.Chat.Completions.ChatCompletionChunk.Choice.Delta {
@@ -139,7 +141,7 @@ async function example() {
         }
         if (results.length > 0) {
             let toolResultContent = `${API_RESULT_TAG}\n${results.join('\n')}\n${API_RESULT_END_TAG}`
-            console.log(toolResultContent);
+            console.log(COLORS.GREEN + toolResultContent + COLORS.RESET);
             messages.push({
                 role: 'user',
                 content: toolResultContent
