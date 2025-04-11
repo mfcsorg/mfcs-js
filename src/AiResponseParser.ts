@@ -16,7 +16,7 @@ interface ApiCallParameters {
 interface ApiResult {
     call_id: number;
     name: string;
-    result: Record<string, any>;
+    result: any;
 }
 
 /**
@@ -116,7 +116,7 @@ export class AiResponseParser extends EventEmitter {
      * @param name API name
      * @param result Execution result
      */
-    public addApiResult(callId: number, name: string, result: Record<string, any>): void {
+    public addApiResult(callId: number, name: string, result: any): void {
         this.apiResults.set(callId, { call_id: callId, name, result });
 
         // If all API calls have results and parsing is complete, trigger results event
@@ -144,7 +144,13 @@ export class AiResponseParser extends EventEmitter {
             .sort((a, b) => a.call_id - b.call_id);
 
         for (const result of sortedResults) {
-            resultText += `[call_id: ${result.call_id} name: ${result.name}] ${JSON.stringify(result.result)}\n`;
+            let tmp: string;
+            if (typeof result.result !== 'string') {
+                tmp = JSON.stringify(result.result);
+            } else {
+                tmp = result.result;
+            }
+            resultText += `[call_id: ${result.call_id} name: ${result.name}] ${tmp}\n`;
         }
 
         resultText += '</api_result>';
