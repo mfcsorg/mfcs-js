@@ -8,6 +8,14 @@ Model Function Calling Standard
 npm install mfcs-js
 ```
 
+or clone from github
+
+```bash
+git clone --recurse-submodules https://github.com/mfcsorg/mfcs-js.git
+cd mfcs-js
+npm run install
+```
+
 ## Features
 
 ### AI Response Parser (AiResponseParser)
