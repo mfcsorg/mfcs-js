@@ -13,6 +13,7 @@ or clone from github
 ```bash
 git clone --recurse-submodules https://github.com/mfcsorg/mfcs-js.git
 cd mfcs-js
+git submodule update --init --recursive
 npm run install
 ```
 
