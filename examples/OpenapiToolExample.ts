@@ -1,8 +1,7 @@
 import { getToolPrompt, parseAiResponse, API_RESULT_TAG, API_RESULT_END_TAG } from '../src/index';
 import OpenAI from 'openai';
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import * as readline from 'readline';
+import axios from 'axios';
 
 const COLORS = {
     CYAN: '\x1b[36m',
@@ -11,42 +10,64 @@ const COLORS = {
     YELLOW: '\x1b[33m'
 };
 
-async function example() {
+interface ToolParameters {
+    query: string;
+}
 
-    console.log('Deepseek Reasoning MCP Example');
+async function http_query(toolParams: { query: string }) {
+    try {
+        const encodedQuery = encodeURIComponent(toolParams.query);
+        const url = `https://r.jina.ai/https://www.baidu.com/s?wd=${encodedQuery}`;
+        const headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+        const response = await axios.get(url, { headers });
+
+        // Limit response data to 5000 characters
+        let responseData = response.data;
+        if (typeof responseData === 'string' && responseData.length > 5000) {
+            responseData = responseData.substring(0, 5000) + '... (content truncated)';
+        } else if (typeof responseData === 'object') {
+            // If it's an object, convert to string then limit length
+            const dataStr = JSON.stringify(responseData);
+            if (dataStr.length > 5000) {
+                responseData = JSON.parse(dataStr.substring(0, 5000) + '..."} (content truncated)');
+            }
+        }
+
+        return responseData;
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            return `Error performing search: ${error.message}`;
+        }
+        return `Unexpected error: ${error}`;
+    }
+}
+
+async function example() {
+    console.log('OpenAPI call example, please input the content to search');
 
     const apiKey = process.env.OPENAI_API_KEY;
     const baseURL = process.env.OPENAI_BASE_URL || 'https://api.deepseek.com';
-    const modelName = process.env.OPENAI_MODEL_NAME || 'deepseek-reasoner';
-
-    const transport = new StdioClientTransport({
-        command: "npx",
-        args: [
-            "-y",
-            "@modelcontextprotocol/server-filesystem",
-            __dirname
-        ]
-    });
-    const mcpClient = new Client(
-        {
-            name: "example-client",
-            version: "1.0.0",
-        },
-        {
-            capabilities: {
-                tools: {}
-            }
-        }
-    );
-
-    await mcpClient.connect(transport);
-
-    const tools = await mcpClient.listTools();
+    const modelName = process.env.OPENAI_MODEL_NAME || 'deepseek-chat';
 
     const toolPacket = [
         {
-            description: 'filesystem, Secure file operations with configurable access controls',
-            api_list: tools
+            description: 'Search Related API',
+            api_list: [{
+                name: "http_query",
+                description: "Search Engine Query",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        query: {
+                            type: "string",
+                            description: "Content to be searched"
+                        }
+                    },
+                    required: ["query"]
+                }
+            }]
         }
     ];
 
@@ -74,7 +95,7 @@ async function example() {
     let messages: any[] = [
         {
             role: 'system',
-            content: `You are a helpful assistant.\n${toolPrompt}`
+            content: `Please search for the content provided by the user.\n${toolPrompt}`
         }
     ];
 
@@ -85,8 +106,6 @@ async function example() {
 
             if (userInput.toLowerCase() === 'exit') {
                 console.log('Goodbye!');
-                await mcpClient.close();
-                transport.close();
                 rl.close();
                 process.exit(0);
             }
@@ -128,12 +147,13 @@ async function example() {
         for (const call of parsedCalls) {
             const toolName = call.name;
             const callId = call.call_id;
-            const toolParams = call.parameters;
-            const toolResult = await mcpClient.callTool({
-                name: toolName,
-                arguments: toolParams
-            });
-            results.push(`[call_id: ${callId} name: ${toolName}] ${JSON.stringify(toolResult)}`);
+            const toolParams = call.parameters as ToolParameters;
+            if (toolName == "http_query") {
+                const toolResult = await http_query(toolParams);
+                results.push(`[call_id: ${callId} name: ${toolName}] ${JSON.stringify(toolResult)}`);
+            } else {
+                results.push(`[call_id: ${callId} name: ${toolName}] Tool not implemented`);
+            }
         }
         if (results.length > 0) {
             let toolResultContent = `${API_RESULT_TAG}\n${results.join('\n')}\n${API_RESULT_END_TAG}`

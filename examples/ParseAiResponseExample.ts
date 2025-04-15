@@ -4,7 +4,7 @@ import { parseAiResponse } from '../src/index';
 const exampleResponse = `
 Test example
 
-<call_api>
+<mfcs_call>
 <instructions>Get user information</instructions>
 <call_id>call_123</call_id>
 <name>getUserInfo</name>
@@ -14,9 +14,9 @@ Test example
   "includeProfile": true
 }
 </parameters>
-</call_api>
+</mfcs_call>
 
-<call_api>
+<mfcs_call>
 <instructions>Update user settings</instructions>
 <call_id>call_456</call_id>
 <name>updateUserSettings</name>
@@ -26,7 +26,7 @@ Test example
   "notifications": false
 }
 </parameters>
-</call_api>
+</mfcs_call>
 
 End
 `;

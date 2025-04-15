@@ -14,7 +14,7 @@ export function parseAiResponse(response: string): ApiCall[] {
     const apiCalls: ApiCall[] = [];
 
     // 使用正则表达式匹配所有call_api块
-    const callApiRegex = /<call_api>([\s\S]*?)<\/call_api>/g;
+    const callApiRegex = /<mfcs_call>([\s\S]*?)<\/mfcs_call>/g;
     let match;
 
     while ((match = callApiRegex.exec(response)) !== null) {
@@ -45,5 +45,5 @@ export function parseAiResponse(response: string): ApiCall[] {
     return apiCalls;
 }
 
-export const API_RESULT_TAG = '<api_result>';
-export const API_RESULT_END_TAG = '</api_result>';
+export const API_RESULT_TAG = '<mfcs_result>';
+export const API_RESULT_END_TAG = '</mfcs_result>';

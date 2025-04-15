@@ -54,7 +54,7 @@ parser.on('apiResults', (results) => {
 
 // Process streaming data
 parser.processChunk('Some text', false);
-parser.processChunk('<call_api><instructions>xxx</instructions><call_id>1</call_id><name>apiName</name><parameters>{"param": "value"}</parameters></call_api>', false);
+parser.processChunk('<mfcs_call><instructions>xxx</instructions><call_id>1</call_id><name>apiName</name><parameters>{"param": "value"}</parameters></mfcs_call>', false);
 parser.processChunk('More text', true); // Last chunk of data
 ```
 
@@ -86,7 +86,7 @@ import { parseAiResponse } from 'mfcs';
 
 // Example response text with multiple API calls
 const response = `
-<call_api>
+<mfcs_call>
 <instructions>Get user information</instructions>
 <call_id>call_123</call_id>
 <name>getUserInfo</name>
@@ -96,9 +96,9 @@ const response = `
   "includeProfile": true
 }
 </parameters>
-</call_api>
+</mfcs_call>
 
-<call_api>
+<mfcs_call>
 <instructions>Update user settings</instructions>
 <call_id>call_456</call_id>
 <name>updateUserSettings</name>
@@ -108,7 +108,7 @@ const response = `
   "notifications": false
 }
 </parameters>
-</call_api>
+</mfcs_call>
 `;
 
 // Parse the response

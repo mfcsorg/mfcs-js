@@ -34,23 +34,40 @@ function example() {
     // Simulate streaming data input
     const streamData = [
         'This is some text, then there is an API call:',
-        '<call_api>',
+        '<mfcs_call>',
         '<instructions>Get user information</instructions>',
         '<call_id>1</call_id>',
         '<name>getUserInfo</name>',
         '<parameters>',
         '{"userId": "12345"}',
         '</parameters>',
-        '</call_api>',
+        '</mfcs_call>',
         'This is more text, then there is another API call:',
-        '<call_api>',
+        '<mfcs_call>',
         '<instructions>Update user status</instructions>',
         '<call_id>2</call_id>',
         '<name>updateUserStatus</name>',
         '<parameters>',
         '{"userId": "12345", "status": "active"}',
         '</parameters>',
-        '</call_api>',
+        '</mfcs_call>',
+        `<mfcs_call>
+        <instructions>Get user information</instructions>
+        <call_id>3</call_id>
+        <name>getUserInfo</name>
+        <parameters>
+        {"userId": "12345"}
+        </parameters>
+        </mfcs_call>
+        This is more text, then there is another API call:
+        <mfcs_call>
+        <instructions>Update user status</instructions>
+        <call_id>4</call_id>
+        <name>updateUserStatus</name>
+        <parameters>
+        {"userId": "12345", "status": "active"}
+        </parameters>
+        </mfcs_call>`,
         'This is the last text.',
         ''
     ];

@@ -1,8 +1,9 @@
 import { getToolPrompt, parseAiResponse, API_RESULT_TAG, API_RESULT_END_TAG } from '../src/index';
 import OpenAI from 'openai';
-import { Client } from "@modelcontextprotocol/sdk/client/index.js";
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import * as readline from 'readline';
+import axios from 'axios';
+import { spawn } from 'child_process';
+import * as path from 'path';
 
 const COLORS = {
     CYAN: '\x1b[36m',
@@ -11,42 +12,61 @@ const COLORS = {
     YELLOW: '\x1b[33m'
 };
 
-async function example() {
+interface ToolParameters {
+    query: string;
+}
 
-    console.log('Deepseek Reasoning MCP Example');
+async function python_query(toolParams: { query: string }) {
+    return new Promise((resolve, reject) => {
+        const pythonScript = path.join(__dirname, 'PythonHttpSearch.py');
+        const env = { ...process.env, PYTHONIOENCODING: 'utf-8' };
+        const pythonProcess = spawn('python', [pythonScript, '-q', toolParams.query], { env });
+
+        let output = '';
+        let errorOutput = '';
+
+        pythonProcess.stdout.on('data', (data) => {
+            output += data.toString('utf-8');
+        });
+
+        pythonProcess.stderr.on('data', (data) => {
+            errorOutput += data.toString('utf-8');
+        });
+
+        pythonProcess.on('close', (code) => {
+            if (code === 0) {
+                resolve(output.trim());
+            } else {
+                reject(new Error(`Python script execution failed: ${errorOutput}`));
+            }
+        });
+    });
+}
+
+async function example() {
+    console.log('OpenAPI call example, please input the content to search');
 
     const apiKey = process.env.OPENAI_API_KEY;
     const baseURL = process.env.OPENAI_BASE_URL || 'https://api.deepseek.com';
-    const modelName = process.env.OPENAI_MODEL_NAME || 'deepseek-reasoner';
-
-    const transport = new StdioClientTransport({
-        command: "npx",
-        args: [
-            "-y",
-            "@modelcontextprotocol/server-filesystem",
-            __dirname
-        ]
-    });
-    const mcpClient = new Client(
-        {
-            name: "example-client",
-            version: "1.0.0",
-        },
-        {
-            capabilities: {
-                tools: {}
-            }
-        }
-    );
-
-    await mcpClient.connect(transport);
-
-    const tools = await mcpClient.listTools();
+    const modelName = process.env.OPENAI_MODEL_NAME || 'deepseek-chat';
 
     const toolPacket = [
         {
-            description: 'filesystem, Secure file operations with configurable access controls',
-            api_list: tools
+            description: 'Search Related API',
+            api_list: [{
+                name: "python_query",
+                description: "Search Engine Query",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        query: {
+                            type: "string",
+                            description: "Content to be searched"
+                        }
+                    },
+                    required: ["query"]
+                }
+            }]
         }
     ];
 
@@ -74,7 +94,7 @@ async function example() {
     let messages: any[] = [
         {
             role: 'system',
-            content: `You are a helpful assistant.\n${toolPrompt}`
+            content: `Please search for the content provided by the user.\n${toolPrompt}`
         }
     ];
 
@@ -85,8 +105,6 @@ async function example() {
 
             if (userInput.toLowerCase() === 'exit') {
                 console.log('Goodbye!');
-                await mcpClient.close();
-                transport.close();
                 rl.close();
                 process.exit(0);
             }
@@ -128,12 +146,13 @@ async function example() {
         for (const call of parsedCalls) {
             const toolName = call.name;
             const callId = call.call_id;
-            const toolParams = call.parameters;
-            const toolResult = await mcpClient.callTool({
-                name: toolName,
-                arguments: toolParams
-            });
-            results.push(`[call_id: ${callId} name: ${toolName}] ${JSON.stringify(toolResult)}`);
+            const toolParams = call.parameters as ToolParameters;
+            if (toolName == "python_query") {
+                const toolResult = await python_query(toolParams);
+                results.push(`[call_id: ${callId} name: ${toolName}] ${JSON.stringify(toolResult)}`);
+            } else {
+                results.push(`[call_id: ${callId} name: ${toolName}] Tool not implemented`);
+            }
         }
         if (results.length > 0) {
             let toolResultContent = `${API_RESULT_TAG}\n${results.join('\n')}\n${API_RESULT_END_TAG}`

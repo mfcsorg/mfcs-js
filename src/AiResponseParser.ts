@@ -43,7 +43,7 @@ export class AiResponseParser extends EventEmitter {
         if (chunk != null && chunk != undefined && chunk != '') {
             this.buffer += chunk;
 
-            // Try to parse complete call_api blocks
+            // Try to parse complete mfcs_call blocks
             this.parseCallApiBlocks();
         }
 
@@ -55,10 +55,10 @@ export class AiResponseParser extends EventEmitter {
     }
 
     /**
-     * Parse call_api blocks from buffer
+     * Parse mfcs_call blocks from buffer
      */
     private parseCallApiBlocks(): void {
-        const callApiRegex = /<call_api>([\s\S]*?)<\/call_api>/g;
+        const callApiRegex = /<mfcs_call>([\s\S]*?)<\/mfcs_call>/g;
         let match;
 
         while ((match = callApiRegex.exec(this.buffer)) !== null) {
@@ -72,7 +72,7 @@ export class AiResponseParser extends EventEmitter {
                     this.emit('apiCall', apiCall);
                 }
             } catch (error) {
-                console.error('Failed to parse call_api block:', error);
+                console.error('Failed to parse mfcs_call block:', error);
             }
 
             // Remove processed block from buffer
@@ -81,8 +81,8 @@ export class AiResponseParser extends EventEmitter {
     }
 
     /**
-     * Parse call_api content
-     * @param content Content inside call_api tags
+     * Parse mfcs_call content
+     * @param content Content inside mfcs_call tags
      * @returns Parsed API call parameters
      */
     private parseCallApiContent(content: string): ApiCallParameters | null {
@@ -137,7 +137,7 @@ export class AiResponseParser extends EventEmitter {
             return;
         }
 
-        let resultText = '<api_result>\n';
+        let resultText = '<mfcs_result>\n';
 
         // Sort results by call_id
         const sortedResults = Array.from(this.apiResults.values())
@@ -153,7 +153,7 @@ export class AiResponseParser extends EventEmitter {
             resultText += `[call_id: ${result.call_id} name: ${result.name}] ${tmp}\n`;
         }
 
-        resultText += '</api_result>';
+        resultText += '</mfcs_result>';
 
         this.emit('apiResults', resultText);
     }
