@@ -1,0 +1,3 @@
+[submodule "mfcs-prompt"]
+	path = mfcs-prompt
+	url = https://github.com/mfcsorg/mfcs-prompt.git
