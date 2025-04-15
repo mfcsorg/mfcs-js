@@ -17,21 +17,21 @@ interface ToolParameters {
 async function http_query(toolParams: { query: string }) {
     try {
         const encodedQuery = encodeURIComponent(toolParams.query);
-        const url = `https://r.jina.ai/https://www.baidu.com/s?wd=${encodedQuery}`;
+        const url = `https://r.jina.ai/https://www.bing.com/search?q=${encodedQuery}`;
         const headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
         const response = await axios.get(url, { headers });
 
-        // Limit response data to 5000 characters
+        // Limit response data to 15000 characters
         let responseData = response.data;
-        if (typeof responseData === 'string' && responseData.length > 5000) {
-            responseData = responseData.substring(0, 5000) + '... (content truncated)';
+        if (typeof responseData === 'string' && responseData.length > 15000) {
+            responseData = responseData.substring(0, 15000) + '... (content truncated)';
         } else if (typeof responseData === 'object') {
             // If it's an object, convert to string then limit length
             const dataStr = JSON.stringify(responseData);
-            if (dataStr.length > 5000) {
-                responseData = JSON.parse(dataStr.substring(0, 5000) + '..."} (content truncated)');
+            if (dataStr.length > 15000) {
+                responseData = JSON.parse(dataStr.substring(0, 15000) + '..."} (content truncated)');
             }
         }
 
