@@ -7,67 +7,67 @@ function example() {
     // Create parser instance
     const parser = new AiResponseParser();
 
-    // Listen for API call events
-    parser.on('apiCall', (apiCall) => {
-        console.log('Received API call:', apiCall);
+    // Listen for TOOL call events
+    parser.on('toolCall', (toolCall) => {
+        console.log('Received TOOL call:', toolCall);
 
-        // Simulate API call
+        // Simulate TOOL call
         setTimeout(() => {
-            // Add API execution result
-            parser.addApiResult(
-                apiCall.call_id,
-                apiCall.name,
-                { success: true, message: `API ${apiCall.name} executed successfully` }
+            // Add TOOL execution result
+            parser.addToolResult(
+                toolCall.call_id,
+                toolCall.name,
+                { success: true, message: `TOOL ${toolCall.name} executed successfully` }
             );
         }, 1000);
     });
 
-    // Listen for API results events
-    parser.on('apiResults', (results) => {
+    // Listen for TOOL results events
+    parser.on('toolResults', (results) => {
         if (results) {
-            console.log('All API execution results:', results);
+            console.log('All TOOL execution results:', results);
         } else {
-            console.log('No API execution');
+            console.log('No TOOL execution');
         }
     });
 
     // Simulate streaming data input
     const streamData = [
-        'This is some text, then there is an API call:',
-        '<mfcs_call>',
+        'This is some text, then there is an TOOL call:',
+        '<tool_call>',
         '<instructions>Get user information</instructions>',
         '<call_id>1</call_id>',
         '<name>getUserInfo</name>',
         '<parameters>',
         '{"userId": "12345"}',
         '</parameters>',
-        '</mfcs_call>',
-        'This is more text, then there is another API call:',
-        '<mfcs_call>',
+        '</tool_call>',
+        'This is more text, then there is another TOOL call:',
+        '<tool_call>',
         '<instructions>Update user status</instructions>',
         '<call_id>2</call_id>',
         '<name>updateUserStatus</name>',
         '<parameters>',
         '{"userId": "12345", "status": "active"}',
         '</parameters>',
-        '</mfcs_call>',
-        `<mfcs_call>
+        '</tool_call>',
+        `<tool_call>
         <instructions>Get user information</instructions>
         <call_id>3</call_id>
         <name>getUserInfo</name>
         <parameters>
         {"userId": "12345"}
         </parameters>
-        </mfcs_call>
-        This is more text, then there is another API call:
-        <mfcs_call>
+        </tool_call>
+        This is more text, then there is another TOOL call:
+        <tool_call>
         <instructions>Update user status</instructions>
         <call_id>4</call_id>
         <name>updateUserStatus</name>
         <parameters>
         {"userId": "12345", "status": "active"}
         </parameters>
-        </mfcs_call>`,
+        </tool_call>`,
         'This is the last text.',
         ''
     ];

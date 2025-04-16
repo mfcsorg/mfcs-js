@@ -4,11 +4,11 @@ import { getToolPrompt } from '../src/index';
  * Example: How to use the getToolPrompt function
  */
 function example() {
-    // Prepare API package data
-    const apiPacket = [
+    // Prepare TOOL package data
+    const toolPacket = [
         {
-            description: 'User-related APIs',
-            api_list: [
+            description: 'User-related TOOLs',
+            tool_list: [
                 {
                     "name": "getUserInfo",
                     "description": "Get user information",
@@ -52,8 +52,8 @@ function example() {
             ]
         },
         {
-            description: 'Product-related APIs',
-            api_list: [
+            description: 'Product-related TOOLs',
+            tool_list: [
                 {
                     "name": "getProductList",
                     "description": "Get product list",
@@ -81,7 +81,7 @@ function example() {
     ];
 
     // Generate tool prompt
-    const toolPrompt = getToolPrompt(apiPacket);
+    const toolPrompt = getToolPrompt(toolPacket);
 
     // Output tool prompt
     console.log('Generated tool prompt:');

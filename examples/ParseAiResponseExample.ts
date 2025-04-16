@@ -4,7 +4,7 @@ import { parseAiResponse } from '../src/index';
 const exampleResponse = `
 Test example
 
-<mfcs_call>
+<tool_call>
 <instructions>Get user information</instructions>
 <call_id>call_123</call_id>
 <name>getUserInfo</name>
@@ -14,9 +14,9 @@ Test example
   "includeProfile": true
 }
 </parameters>
-</mfcs_call>
+</tool_call>
 
-<mfcs_call>
+<tool_call>
 <instructions>Update user settings</instructions>
 <call_id>call_456</call_id>
 <name>updateUserSettings</name>
@@ -26,7 +26,7 @@ Test example
   "notifications": false
 }
 </parameters>
-</mfcs_call>
+</tool_call>
 
 End
 `;
@@ -36,11 +36,11 @@ const parsedCalls = parseAiResponse(exampleResponse);
 console.log('Parsing results:');
 console.log(JSON.stringify(parsedCalls, null, 2));
 
-// Access specific API call
+// Access specific TOOL call
 if (parsedCalls.length > 0) {
-  console.log('\nFirst API call:');
+  console.log('\nFirst TOOL call:');
   console.log(`Instructions: ${parsedCalls[0].instructions}`);
   console.log(`Call ID: ${parsedCalls[0].call_id}`);
-  console.log(`API Name: ${parsedCalls[0].name}`);
+  console.log(`TOOL Name: ${parsedCalls[0].name}`);
   console.log(`Parameters:`, parsedCalls[0].parameters);
 } 

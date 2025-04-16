@@ -1,4 +1,4 @@
-import { getToolPrompt, parseAiResponse, API_RESULT_TAG, API_RESULT_END_TAG } from '../src/index';
+import { getToolPrompt, parseAiResponse, TOOL_RESULT_TAG, TOOL_RESULT_END_TAG } from '../src/index';
 import OpenAI from 'openai';
 import * as readline from 'readline';
 import axios from 'axios';
@@ -53,8 +53,8 @@ async function example() {
 
     const toolPacket = [
         {
-            description: 'Search Related API',
-            api_list: [{
+            description: 'Search Related TOOL',
+            tool_list: [{
                 name: "http_query",
                 description: "Search Engine Query",
                 parameters: {
@@ -156,7 +156,7 @@ async function example() {
             }
         }
         if (results.length > 0) {
-            let toolResultContent = `${API_RESULT_TAG}\n${results.join('\n')}\n${API_RESULT_END_TAG}`
+            let toolResultContent = `${TOOL_RESULT_TAG}\n${results.join('\n')}\n${TOOL_RESULT_END_TAG}`
             console.log(COLORS.GREEN + toolResultContent + COLORS.RESET);
             messages.push({
                 role: 'user',

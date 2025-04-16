@@ -2,8 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 function readToolPrompt() {
-    const promptPath = path.join(__dirname, 'mfcs-prompt', 'ToolPrompt.txt');
-    return fs.readFileSync(promptPath, 'utf8');
+  const promptPath = path.join(__dirname, 'mfcs-prompt', 'ToolPrompt.txt');
+  return fs.readFileSync(promptPath, 'utf8');
 }
 
 const toolPromptContent = readToolPrompt();
@@ -11,15 +11,15 @@ const toolPromptContent = readToolPrompt();
 // 读取模板内容
 const templateContent = `/**
  * Get tool prompt
- * @param packet Tool package [{description: string, api_list: [{name: string, description: string, parameters: string}]}]
+ * @param packet Tool package [{description: string, tool_list: [{name: string, description: string, parameters: string}]}]
  * @returns Tool prompt
  */
 export function getToolPrompt(packet: any): string {
   let prompt = \`
 ${toolPromptContent}
-<api_list>
+<tool_list>
 \${JSON.stringify(packet)}
-</api_list>
+</tool_list>
     \`
   return prompt
 }

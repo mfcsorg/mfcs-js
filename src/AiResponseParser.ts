@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events';
 
 /**
- * API call parameters interface
+ * TOOL call parameters interface
  */
-interface ApiCallParameters {
+interface ToolCallParameters {
     instructions: string;
     call_id: number;
     name: string;
@@ -11,9 +11,9 @@ interface ApiCallParameters {
 }
 
 /**
- * API execution result interface
+ * TOOL execution result interface
  */
-interface ApiResult {
+interface ToolResult {
     call_id: number;
     name: string;
     result: any;
@@ -21,12 +21,12 @@ interface ApiResult {
 
 /**
  * AI Response Parser class
- * Used to parse streaming AI responses, handle API calls and results
+ * Used to parse streaming AI responses, handle TOOL calls and results
  */
 export class AiResponseParser extends EventEmitter {
     private buffer: string = '';
-    private apiCalls: Map<number, ApiCallParameters> = new Map();
-    private apiResults: Map<number, ApiResult> = new Map();
+    private toolCalls: Map<number, ToolCallParameters> = new Map();
+    private toolResults: Map<number, ToolResult> = new Map();
     private isComplete: boolean = false;
     private callIdCounter: number = 0;
 
@@ -43,49 +43,49 @@ export class AiResponseParser extends EventEmitter {
         if (chunk != null && chunk != undefined && chunk != '') {
             this.buffer += chunk;
 
-            // Try to parse complete mfcs_call blocks
-            this.parseCallApiBlocks();
+            // Try to parse complete tool_call blocks
+            this.parseToolCallBlocks();
         }
 
         // If this is the last chunk, mark as complete and trigger results event
         if (isLast) {
             this.isComplete = true;
-            this.emitApiResults();
+            this.emitToolResults();
         }
     }
 
     /**
-     * Parse mfcs_call blocks from buffer
+     * Parse tool_call blocks from buffer
      */
-    private parseCallApiBlocks(): void {
-        const callApiRegex = /<mfcs_call>([\s\S]*?)<\/mfcs_call>/g;
+    private parseToolCallBlocks(): void {
+        const toolCallRegex = /<tool_call>([\s\S]*?)<\/tool_call>/g;
         let match;
 
-        while ((match = callApiRegex.exec(this.buffer)) !== null) {
-            const callApiBlock = match[0];
-            const callApiContent = match[1];
+        while ((match = toolCallRegex.exec(this.buffer)) !== null) {
+            const toolCallBlock = match[0];
+            const toolCallContent = match[1];
 
             try {
-                const apiCall = this.parseCallApiContent(callApiContent);
-                if (apiCall) {
-                    this.apiCalls.set(apiCall.call_id, apiCall);
-                    this.emit('apiCall', apiCall);
+                const toolCall = this.parseCallToolContent(toolCallContent);
+                if (toolCall) {
+                    this.toolCalls.set(toolCall.call_id, toolCall);
+                    this.emit('toolCall', toolCall);
                 }
             } catch (error) {
-                console.error('Failed to parse mfcs_call block:', error);
+                console.error('Failed to parse tool_call block:', error);
             }
 
             // Remove processed block from buffer
-            this.buffer = this.buffer.replace(callApiBlock, '');
+            this.buffer = this.buffer.replace(toolCallBlock, '');
         }
     }
 
     /**
-     * Parse mfcs_call content
-     * @param content Content inside mfcs_call tags
-     * @returns Parsed API call parameters
+     * Parse tool_call content
+     * @param content Content inside tool_call tags
+     * @returns Parsed TOOL call parameters
      */
-    private parseCallApiContent(content: string): ApiCallParameters | null {
+    private parseCallToolContent(content: string): ToolCallParameters | null {
         const instructionsMatch = /<instructions>([\s\S]*?)<\/instructions>/i.exec(content);
         const callIdMatch = /<call_id>([\s\S]*?)<\/call_id>/i.exec(content);
         const nameMatch = /<name>([\s\S]*?)<\/name>/i.exec(content);
@@ -111,36 +111,36 @@ export class AiResponseParser extends EventEmitter {
     }
 
     /**
-     * Add API execution result
-     * @param callId API call ID
-     * @param name API name
+     * Add TOOL execution result
+     * @param callId TOOL call ID
+     * @param name TOOL name
      * @param result Execution result
      */
-    public addApiResult(callId: number, name: string, result: any): void {
-        this.apiResults.set(callId, { call_id: callId, name, result });
+    public addToolResult(callId: number, name: string, result: any): void {
+        this.toolResults.set(callId, { call_id: callId, name, result });
 
-        // If all API calls have results and parsing is complete, trigger results event
-        if (this.isComplete && this.apiCalls.size === this.apiResults.size) {
-            this.emitApiResults();
+        // If all TOOL calls have results and parsing is complete, trigger results event
+        if (this.isComplete && this.toolCalls.size === this.toolResults.size) {
+            this.emitToolResults();
         }
     }
 
     /**
-     * Emit API results event
+     * Emit TOOL results event
      */
-    private emitApiResults(): void {
-        if (this.apiCalls.size === 0) {
-            this.emit('apiResults', null);
+    private emitToolResults(): void {
+        if (this.toolCalls.size === 0) {
+            this.emit('toolResults', null);
             return;
         }
-        if (this.apiCalls.size !== this.apiResults.size) {
+        if (this.toolCalls.size !== this.toolResults.size) {
             return;
         }
 
-        let resultText = '<mfcs_result>\n';
+        let resultText = '<tool_result>\n';
 
         // Sort results by call_id
-        const sortedResults = Array.from(this.apiResults.values())
+        const sortedResults = Array.from(this.toolResults.values())
             .sort((a, b) => a.call_id - b.call_id);
 
         for (const result of sortedResults) {
@@ -153,8 +153,8 @@ export class AiResponseParser extends EventEmitter {
             resultText += `[call_id: ${result.call_id} name: ${result.name}] ${tmp}\n`;
         }
 
-        resultText += '</mfcs_result>';
+        resultText += '</tool_result>';
 
-        this.emit('apiResults', resultText);
+        this.emit('toolResults', resultText);
     }
 } 

@@ -1,4 +1,4 @@
-import { getToolPrompt, parseAiResponse, API_RESULT_TAG, API_RESULT_END_TAG } from '../src/index';
+import { getToolPrompt, parseAiResponse, TOOL_RESULT_TAG, TOOL_RESULT_END_TAG } from '../src/index';
 import OpenAI from 'openai';
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
@@ -46,7 +46,7 @@ async function example() {
     const toolPacket = [
         {
             description: 'filesystem, Secure file operations with configurable access controls',
-            api_list: tools
+            tool_list: tools
         }
     ];
 
@@ -136,7 +136,7 @@ async function example() {
             results.push(`[call_id: ${callId} name: ${toolName}] ${JSON.stringify(toolResult)}`);
         }
         if (results.length > 0) {
-            let toolResultContent = `${API_RESULT_TAG}\n${results.join('\n')}\n${API_RESULT_END_TAG}`
+            let toolResultContent = `${TOOL_RESULT_TAG}\n${results.join('\n')}\n${TOOL_RESULT_END_TAG}`
             console.log(COLORS.GREEN + toolResultContent + COLORS.RESET);
             messages.push({
                 role: 'user',
