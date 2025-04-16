@@ -201,7 +201,10 @@ npm run example:toolprompt
 set OPENAI_API_KEY=your_api_key_here
 # Linux/Mac
 export OPENAI_API_KEY=your_api_key_here
+
 npm run example:reasoningmcp
+npm run example:openapiToolExample
+npm run example:pythonToolExample
 ```
 
 ## License
