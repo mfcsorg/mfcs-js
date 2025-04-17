@@ -17,7 +17,7 @@ You can use tools to solve tasks. Follow these rules about tool calling:
 8. tool_result is automatically returned by tool calls and is not user input. Do not treat it as user input. Do not thank the user.
 
 ===Interface Usage===
-## tool_call
+## mfcs_tool
 Description: Request to call an tool. The tool defines the input pattern, specifying required and optional parameters.
 Parameters:
 - instructions: (required) Content to be executed, actions, etc., reminding users what to do
@@ -25,7 +25,7 @@ Parameters:
 - name: (required) Name of the tool to execute. Names can only be selected from the following tool list. Never generate your own
 - parameters: (required) A JSON object containing tool input parameters, following the tool's input pattern
 Example:
-<tool_call>
+<mfcs_tool>
 <instructions>xxx</instructions>
 <call_id>call tool index</call_id>
 <name>tool name here</name>
@@ -35,10 +35,10 @@ Example:
   "param2": "value2"
 }
 </parameters>
-</tool_call>
+</mfcs_tool>
 
 ===Restrictions===
-1. The name in tool_call can only be selected from the tool list, cannot be self-generated.
+1. The name in mfcs_tool can only be selected from the tool list, cannot be self-generated.
 2. You should not generate tool_result content. do not assume tool execution result.
 3. Do not put tool calls in markdown.
 

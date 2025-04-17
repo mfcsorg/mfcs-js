@@ -63,7 +63,7 @@ parser.on('toolResults', (results) => {
 
 // Process streaming data
 parser.processChunk('Some text', false);
-parser.processChunk('<tool_call><instructions>xxx</instructions><call_id>1</call_id><name>toolName</name><parameters>{"param": "value"}</parameters></tool_call>', false);
+parser.processChunk('<mfcs_tool><instructions>xxx</instructions><call_id>1</call_id><name>toolName</name><parameters>{"param": "value"}</parameters></mfcs_tool>', false);
 parser.processChunk('More text', true); // Last chunk of data
 ```
 
@@ -95,7 +95,7 @@ import { parseAiResponse } from 'mfcs';
 
 // Example response text with multiple TOOL calls
 const response = `
-<tool_call>
+<mfcs_tool>
 <instructions>Get user information</instructions>
 <call_id>call_123</call_id>
 <name>getUserInfo</name>
@@ -105,9 +105,9 @@ const response = `
   "includeProfile": true
 }
 </parameters>
-</tool_call>
+</mfcs_tool>
 
-<tool_call>
+<mfcs_tool>
 <instructions>Update user settings</instructions>
 <call_id>call_456</call_id>
 <name>updateUserSettings</name>
@@ -117,7 +117,7 @@ const response = `
   "notifications": false
 }
 </parameters>
-</tool_call>
+</mfcs_tool>
 `;
 
 // Parse the response

@@ -14,7 +14,7 @@ export function parseAiResponse(response: string): ToolCall[] {
     const toolCalls: ToolCall[] = [];
 
     // 使用正则表达式匹配所有call_tool块
-    const toolCallRegex = /<tool_call>([\s\S]*?)<\/tool_call>/g;
+    const toolCallRegex = /<mfcs_tool>([\s\S]*?)<\/mfcs_tool>/g;
     let match;
 
     while ((match = toolCallRegex.exec(response)) !== null) {

@@ -58,7 +58,7 @@ export class AiResponseParser extends EventEmitter {
      * Parse tool_call blocks from buffer
      */
     private parseToolCallBlocks(): void {
-        const toolCallRegex = /<tool_call>([\s\S]*?)<\/tool_call>/g;
+        const toolCallRegex = /<mfcs_tool>([\s\S]*?)<\/mfcs_tool>/g;
         let match;
 
         while ((match = toolCallRegex.exec(this.buffer)) !== null) {
