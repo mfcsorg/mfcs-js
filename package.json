@@ -1,6 +1,6 @@
 {
     "name": "mfcs-js",
-    "version": "0.0.16",
+    "version": "0.0.18",
     "description": "A utility library for common JavaScript operations",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
