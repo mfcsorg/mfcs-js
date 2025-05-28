@@ -7,9 +7,9 @@ function example() {
     // Create parser instance
     const parser = new AiResponseParser();
 
-    // Listen for TOOL call events
+    // Listen for call events
     parser.on('toolCall', (toolCall) => {
-        console.log('Received TOOL call:', toolCall);
+        console.log('Received call:', toolCall);
 
         // Simulate TOOL call
         setTimeout(() => {
@@ -17,7 +17,8 @@ function example() {
             parser.addToolResult(
                 toolCall.call_id,
                 toolCall.name,
-                { success: true, message: `TOOL ${toolCall.name} executed successfully` }
+                { success: true, message: `TOOL ${toolCall.name} executed successfully` },
+                toolCall.type
             );
         }, 1000);
     });
@@ -67,7 +68,16 @@ function example() {
         <parameters>
         {"userId": "12345", "status": "active"}
         </parameters>
-        </mfcs_tool>`,
+        </mfcs_tool>
+        This is more text, then there is another Agent call:
+        <mfcs_agent>
+        <instructions>Update user status</instructions>
+        <agent_id>1</agent_id>
+        <name>updateUserStatus</name>
+        <parameters>
+        {"userId": "12345", "status": "active"}
+        </parameters>
+        </mfcs_agent>`,
         'This is the last text.',
         ''
     ];

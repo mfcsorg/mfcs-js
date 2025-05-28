@@ -8,6 +8,7 @@ interface ToolCallParameters {
     call_id: number;
     name: string;
     parameters: Record<string, any>;
+    type: string;
 }
 
 /**
@@ -25,8 +26,8 @@ interface ToolResult {
  */
 export class AiResponseParser extends EventEmitter {
     private buffer: string = '';
-    private toolCalls: Map<number, ToolCallParameters> = new Map();
-    private toolResults: Map<number, ToolResult> = new Map();
+    private toolCalls: Map<string, ToolCallParameters> = new Map();
+    private toolResults: string[] = [];
     private isComplete: boolean = false;
     private callIdCounter: number = 0;
 
@@ -45,6 +46,7 @@ export class AiResponseParser extends EventEmitter {
 
             // Try to parse complete tool_call blocks
             this.parseToolCallBlocks();
+            this.parseAgentCallBlocks();
         }
 
         // If this is the last chunk, mark as complete and trigger results event
@@ -68,7 +70,33 @@ export class AiResponseParser extends EventEmitter {
             try {
                 const toolCall = this.parseCallToolContent(toolCallContent);
                 if (toolCall) {
-                    this.toolCalls.set(toolCall.call_id, toolCall);
+                    this.toolCalls.set("mfcs_tool_" + toolCall.call_id, toolCall);
+                    this.emit('toolCall', toolCall);
+                }
+            } catch (error) {
+                console.error('Failed to parse tool_call block:', error);
+            }
+
+            // Remove processed block from buffer
+            this.buffer = this.buffer.replace(toolCallBlock, '');
+        }
+    }
+
+    /**
+     * Parse tool_call blocks from buffer
+     */
+    private parseAgentCallBlocks(): void {
+        const toolCallRegex = /<mfcs_agent>([\s\S]*?)<\/mfcs_agent>/g;
+        let match;
+
+        while ((match = toolCallRegex.exec(this.buffer)) !== null) {
+            const toolCallBlock = match[0];
+            const toolCallContent = match[1];
+
+            try {
+                const toolCall = this.parseCallAgentContent(toolCallContent);
+                if (toolCall) {
+                    this.toolCalls.set("mfcs_agent_" + toolCall.call_id, toolCall);
                     this.emit('toolCall', toolCall);
                 }
             } catch (error) {
@@ -107,7 +135,37 @@ export class AiResponseParser extends EventEmitter {
             return null;
         }
 
-        return { instructions, call_id, name, parameters };
+        return { instructions, call_id, name, parameters, type: 'mfcs_tool' };
+    }
+
+    /**
+     * Parse mfcs_agent content
+     * @param content Content inside mfcs_agent tags
+     * @returns Parsed TOOL call parameters
+     */
+    private parseCallAgentContent(content: string): ToolCallParameters | null {
+        const instructionsMatch = /<instructions>([\s\S]*?)<\/instructions>/i.exec(content);
+        const callIdMatch = /<agent_id>([\s\S]*?)<\/agent_id>/i.exec(content);
+        const nameMatch = /<name>([\s\S]*?)<\/name>/i.exec(content);
+        const parametersMatch = /<parameters>([\s\S]*?)<\/parameters>/i.exec(content);
+
+        if (!instructionsMatch || !callIdMatch || !nameMatch || !parametersMatch) {
+            return null;
+        }
+
+        const instructions = instructionsMatch[1].trim();
+        const call_id = parseInt(callIdMatch[1].trim(), 10);
+        const name = nameMatch[1].trim();
+
+        let parameters: Record<string, any>;
+        try {
+            parameters = JSON.parse(parametersMatch[1].trim());
+        } catch (error) {
+            console.error('Failed to parse parameters JSON:', error);
+            return null;
+        }
+
+        return { instructions, call_id, name, parameters, type: 'mfcs_agent' };
     }
 
     /**
@@ -115,12 +173,17 @@ export class AiResponseParser extends EventEmitter {
      * @param callId TOOL call ID
      * @param name TOOL name
      * @param result Execution result
+     * @param type TOOL type: mfcs_tool or mfcs_agent
      */
-    public addToolResult(callId: number, name: string, result: any): void {
-        this.toolResults.set(callId, { call_id: callId, name, result });
+    public addToolResult(callId: number, name: string, result: any, type: string): void {
+        if (type == "mfcs_agent") {
+            this.toolResults.push(`<agent_result>\n[agent_id: ${callId} name: ${name}] ${result}\n</agent_result>`);
+        } else {
+            this.toolResults.push(`<tool_result>\n[call_id: ${callId} name: ${name}] ${result}\n</tool_result>`);
+        }
 
         // If all TOOL calls have results and parsing is complete, trigger results event
-        if (this.isComplete && this.toolCalls.size === this.toolResults.size) {
+        if (this.isComplete && this.toolCalls.size === this.toolResults.length) {
             this.emitToolResults();
         }
     }
@@ -133,28 +196,12 @@ export class AiResponseParser extends EventEmitter {
             this.emit('toolResults', null);
             return;
         }
-        if (this.toolCalls.size !== this.toolResults.size) {
+        if (this.toolCalls.size !== this.toolResults.length) {
             return;
         }
 
-        let resultText = '<tool_result>\n';
-
-        // Sort results by call_id
-        const sortedResults = Array.from(this.toolResults.values())
-            .sort((a, b) => a.call_id - b.call_id);
-
-        for (const result of sortedResults) {
-            let tmp: string;
-            if (typeof result.result !== 'string') {
-                tmp = JSON.stringify(result.result);
-            } else {
-                tmp = result.result;
-            }
-            resultText += `[call_id: ${result.call_id} name: ${result.name}] ${tmp}\n`;
-        }
-
-        resultText += '</tool_result>';
+        let resultText = this.toolResults.join('\n');
 
         this.emit('toolResults', resultText);
     }
-} 
+}

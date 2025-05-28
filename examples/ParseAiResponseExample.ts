@@ -28,6 +28,19 @@ Test example
 </parameters>
 </mfcs_tool>
 
+
+<mfcs_agent>
+<instructions>Update user settings</instructions>
+<agent_id>1</agent_id>
+<name>updateUserSettings</name>
+<parameters>
+{
+  "theme": "dark",
+  "notifications": false
+}
+</parameters>
+</mfcs_agent>
+
 End
 `;
 

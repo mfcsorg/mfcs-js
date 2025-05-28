@@ -1,4 +1,4 @@
-import { getToolPrompt } from '../src/index';
+import { getToolPrompt, getAgentPrompt } from '../src/index';
 
 /**
  * Example: How to use the getToolPrompt function
@@ -87,6 +87,15 @@ function example() {
     console.log('Generated tool prompt:');
     console.log('----------------------------------------');
     console.log(toolPrompt);
+    console.log('----------------------------------------');
+
+    // Generate Agent api prompt
+    const agentPrompt = getAgentPrompt(toolPacket);
+
+    // Output agent api prompt
+    console.log('Generated agent api prompt:');
+    console.log('----------------------------------------');
+    console.log(agentPrompt);
     console.log('----------------------------------------');
 }
 

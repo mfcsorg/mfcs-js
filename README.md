@@ -48,7 +48,8 @@ parser.on('toolCall', (toolCall) => {
   parser.addToolResult(
     toolCall.call_id,
     toolCall.name,
-    { success: true, message: 'TOOL executed successfully' }
+    { success: true, message: 'TOOL executed successfully' },
+    toolCall.type
   );
 });
 
@@ -64,6 +65,7 @@ parser.on('toolResults', (results) => {
 // Process streaming data
 parser.processChunk('Some text', false);
 parser.processChunk('<mfcs_tool><instructions>xxx</instructions><call_id>1</call_id><name>toolName</name><parameters>{"param": "value"}</parameters></mfcs_tool>', false);
+parser.processChunk('<mfcs_agent><instructions>xxx</instructions><agent_id>1</agent_id><name>toolName</name><parameters>{"param": "value"}</parameters></mfcs_agent>', false);
 parser.processChunk('More text', true); // Last chunk of data
 ```
 
@@ -75,7 +77,7 @@ parser.processChunk('More text', true); // Last chunk of data
 #### Methods
 
 - `processChunk(chunk: string, isLast: boolean = false)`: Process streaming data chunk.
-- `addToolResult(callId: number, name: string, result: Record<string, any>)`: Add TOOL execution result.
+- `addToolResult(callId: number, name: string, result: Record<string, any>, type: string)`: Add TOOL execution result.
 - `getToolResultPrompt()`: Get tool execution result prompt.
 
 ### AI Response Parse Function (parseAiResponse)
@@ -118,6 +120,17 @@ const response = `
 }
 </parameters>
 </mfcs_tool>
+
+<mfcs_agent>
+<instructions>Update user settings</instructions>
+<agent_id>call_7</agent_id>
+<name>agenttest</name>
+<parameters>
+{
+  "message": "hello"
+}
+</parameters>
+</mfcs_agent>
 `;
 
 // Parse the response
@@ -143,15 +156,16 @@ interface ToolCall {
   call_id: string;
   name: string;
   parameters: Record<string, any>;
+  type: string;
 }
 ```
 
-### Tool Prompt Generator
+### Prompt Generator
 
-The `getToolPrompt` function is used to generate tool prompts, including TOOL list and calling rules.
+The `getToolPrompt, getAgentPrompt` function is used to generate mfcs prompts, including api list and calling rules.
 
 ```typescript
-import { getToolPrompt } from 'mfcs';
+import { getToolPrompt, getAgentPrompt } from 'mfcs';
 
 const packet = {
   'user': {
@@ -183,7 +197,9 @@ const packet = {
   }
 };
 
-const prompt = getToolPrompt(packet);
+let prompt = getToolPrompt(packet);
+console.log(prompt);
+let prompt = getAgentPrompt(packet);
 console.log(prompt);
 ```
 
