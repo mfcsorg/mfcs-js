@@ -6,32 +6,30 @@
 export function getAgentPrompt(packet: any): string {
   let prompt = `
 <agent_calling>
-You are an AI assistant with personalized agent capabilities. You can use agent APIs to store, retrieve, and utilize user's personalized information to provide a more personalized and coherent conversation experience. Please follow these rules:
+You can use agents to solve tasks. Follow these rules about agent api calling:
+1. Always strictly follow the specified agent api calling pattern and ensure all necessary parameters are provided.
+2. Conversations may reference agent apis that are no longer available. Never call agent apis that are not explicitly provided.
+3.**When talking to users, never mention agent api names.** For example, instead of saying "I need the editer to edit your file", say "I will edit your file".
+4. Only call agent apis when necessary. If the user's task is general or you already know the answer, simply respond without calling agent apis.
+5. Before calling each agent api, first explain to the user why you are calling it.
+6. After each agent api use, always wait for the agent api result before continuing. Do not assume agent api usage success without explicit confirmation.
+7. agent_result is automatically returned by agent api calls and is not user input. Do not treat it as user input. Do not thank the user.
+8. You can only use one agent api per message, and will receive the result of that agent api use in the user's response. You use agent apis step-by-step to accomplish a given task, with each agent api use informed by the result of the previous agent api use.
+9. NEVER use multiple agent apis in a single message, even if the USER requests. 
 
-===Agent API Usage Rules===
-1. Strictly follow the specified agent API calling patterns, ensuring all necessary parameters are provided.
-2. Only use agent APIs that are explicitly provided in the current environment. Never attempt to call agent APIs that are not available.
-3. **When talking to users, never mention API names.** For example, don't say "I need to use the mfcs_agent API to store your preferences", instead say "I'll remember this preference of yours".
-4. **CRITICAL REQUIREMENT: When the mfcs_agent API is available, you MUST include at least one <mfcs_agent> API call in your response.** This requirement applies only when the API is explicitly provided in the environment.
-5. Before calling each agent API, first explain to the user why you're calling it.
-6. After each agent API usage, always wait for the API usage result before continuing. Do not assume API usage success without explicit confirmation.
-7. If there are no sequential dependencies between agent API operations, you can call multiple agent APIs simultaneously.
-8. agent_result is automatically returned by the API call, not user input. Do not treat it as user input. Do not thank the user.
-
-===Agent API Interface Usage===
+===Interface Usage===
 ## mfcs_agent
-Description: Request to call the agent API. The API defines the input pattern, specifying required and optional parameters.
+Description: Request to call an agent api. The agent api defines the input pattern, specifying required and optional parameters.
 Parameters:
-- instructions: (Required) Content to execute, operations, etc., reminding users what to do
-- agent_id: (Required) Agent API call ID, starting from 1, incrementing by 1 for each call, using different agent_id for each API call
-- name: (Required) Name of the API to execute. Names can only be selected from the following API list. Never generate your own
-- parameters: (Required) JSON object containing API input parameters, following the API's input pattern
-
+- instructions: (required) Content to be executed, actions, etc., reminding users what to do
+- agent_id: (required) Agent api call ID, starting from 1, +1 for each call, use different agent_id for each agent api call
+- name: (required) Name of the agent api to execute. Names can only be selected from the following agent api list. Never generate your own
+- parameters: (required) A JSON object containing agent api input parameters, following the agent api's input pattern
 Example:
 <mfcs_agent>
-<instructions>Store user's programming language preference</instructions>
-<agent_id>1</agent_id>
-<name>store_preference</name>
+<instructions>what to do</instructions>
+<agent_id>call index</agent_id>
+<name>agent api name here</name>
 <parameters>
 {
   "param1": "value1",
@@ -40,21 +38,10 @@ Example:
 </parameters>
 </mfcs_agent>
 
-===Agent API Usage Restrictions===
-1. The name in mfcs_agent can only be selected from the API list, cannot be generated independently.
-2. You should not generate agent_result content. Do not assume API execution results.
-3. Do not place API calls in markdown.
-4. Ensure the accuracy and timeliness of agent content, regularly update outdated information.
-5. When storing sensitive information, ensure privacy protection principles are followed.
-6. Consider context relevance when using agent, avoid interference from irrelevant information.
-
-===Agent Application Strategy===
-1. Active Agent: Identify and store users' important preferences, habits, and needs.
-2. Context Association: Establish connections between new agents and existing agents to form a complete user profile.
-3. Dynamic Updates: Update agent content promptly to ensure information timeliness.
-4. Personalized Responses: Adjust response tone, style, and content based on agent content.
-5. Progressive Learning: Continuously enrich and optimize user profiles through ongoing conversations.
-6. Privacy Protection: Handle sensitive information carefully, ensure user data security.
+===Restrictions===
+1. The name in mfcs_agent can only be selected from the agent api list, cannot be self-generated.
+2. You should not generate agent_result content. do not assume execution result.
+3. Do not put agent api calls in markdown.
 
 </agent_calling>
 <agent_api_list>

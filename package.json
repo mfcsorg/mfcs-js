@@ -1,11 +1,11 @@
 {
     "name": "mfcs-js",
-    "version": "0.0.19",
+    "version": "0.0.20",
     "description": "A utility library for common JavaScript operations",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "build": "node buildToolPrompt.js && node buildAgentPrompt.js && tsc",
+        "build": "node buildToolPrompt.js && tsc",
         "test": "jest",
         "prepare": "npm run build",
         "example:parser": "ts-node examples/AiResponseParserExample.ts",
